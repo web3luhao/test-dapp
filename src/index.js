@@ -63,10 +63,6 @@ import {
   erc1155Bytecode,
 } from './constants.json';
 
-if (window.qtum) {
-  window.ethereum = window.qtum;
-}
-
 let ethersProvider;
 let hstFactory;
 let piggybankFactory;
@@ -259,6 +255,8 @@ const submitFormButton = document.getElementById('submitForm');
 // Miscellaneous
 const addEthereumChain = document.getElementById('addEthereumChain');
 const switchEthereumChain = document.getElementById('switchEthereumChain');
+const switchQtumMainChain = document.getElementById('switchQtumMainChain');
+const switchQtumTestChain = document.getElementById('switchQtumTestChain');
 
 const initialize = async () => {
   function isRSV() {
@@ -408,7 +406,7 @@ const initialize = async () => {
 
   const onClickConnect = async () => {
     try {
-      const newAccounts = await ethereum.request({
+      const newAccounts = await window.qtum.request({
         method: 'eth_requestAccounts',
       });
       handleNewAccounts(newAccounts);
@@ -523,7 +521,7 @@ const initialize = async () => {
   };
 
   addEthereumChain.onclick = async () => {
-    await ethereum.request({
+    await window.qtum.request({
       method: 'wallet_addEthereumChain',
       params: [
         {
@@ -538,11 +536,33 @@ const initialize = async () => {
   };
 
   switchEthereumChain.onclick = async () => {
-    await ethereum.request({
+    await window.qtum.request({
       method: 'wallet_switchEthereumChain',
       params: [
         {
           chainId: '0x53a',
+        },
+      ],
+    });
+  };
+
+  switchQtumMainChain.onclick = async () => {
+    await window.qtum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [
+        {
+          chainId: '0x51',
+        },
+      ],
+    });
+  };
+
+  switchQtumTestChain.onclick = async () => {
+    await window.qtum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [
+        {
+          chainId: '0x22B9',
         },
       ],
     });
@@ -633,7 +653,7 @@ const initialize = async () => {
 
     sendFailingButton.onclick = async () => {
       try {
-        const result = await ethereum.request({
+        const result = await window.qtum.request({
           method: 'eth_sendTransaction',
           params: [
             {
@@ -686,7 +706,7 @@ const initialize = async () => {
 
     sendMultisigButton.onclick = async () => {
       try {
-        const result = await ethereum.request({
+        const result = await window.qtum.request({
           method: 'eth_sendTransaction',
           params: [
             {
@@ -930,7 +950,7 @@ const initialize = async () => {
       eip747Status.innerHTML = 'Adding token...';
 
       try {
-        const result = await ethereum.request({
+        const result = await window.qtum.request({
           method: 'wallet_watchAsset',
           params: {
             type: 'ERC20',
@@ -957,7 +977,7 @@ const initialize = async () => {
      */
 
     sendButton.onclick = async () => {
-      const result = await ethereum.request({
+      const result = await window.qtum.request({
         method: 'eth_sendTransaction',
         params: [
           {
@@ -974,7 +994,7 @@ const initialize = async () => {
     };
 
     sendEIP1559Button.onclick = async () => {
-      const result = await ethereum.request({
+      const result = await window.qtum.request({
         method: 'eth_sendTransaction',
         params: [
           {
@@ -1030,7 +1050,7 @@ const initialize = async () => {
     };
 
     watchAsset.onclick = async () => {
-      const result = await ethereum.request({
+      const result = await window.qtum.request({
         method: 'wallet_watchAsset',
         params: {
           type: 'ERC20',
@@ -1103,7 +1123,7 @@ const initialize = async () => {
 
     requestPermissionsButton.onclick = async () => {
       try {
-        const permissionsArray = await ethereum.request({
+        const permissionsArray = await window.qtum.request({
           method: 'wallet_requestPermissions',
           params: [{ eth_accounts: {} }],
         });
@@ -1117,7 +1137,7 @@ const initialize = async () => {
 
     getPermissionsButton.onclick = async () => {
       try {
-        const permissionsArray = await ethereum.request({
+        const permissionsArray = await window.qtum.request({
           method: 'wallet_getPermissions',
         });
         permissionsResult.innerHTML =
@@ -1130,7 +1150,7 @@ const initialize = async () => {
 
     getAccountsButton.onclick = async () => {
       try {
-        const _accounts = await ethereum.request({
+        const _accounts = await window.qtum.request({
           method: 'eth_accounts',
         });
         getAccountsResults.innerHTML =
@@ -1147,7 +1167,7 @@ const initialize = async () => {
 
     getEncryptionKeyButton.onclick = async () => {
       try {
-        encryptionKeyDisplay.innerText = await ethereum.request({
+        encryptionKeyDisplay.innerText = await window.qtum.request({
           method: 'eth_getEncryptionPublicKey',
           params: [accounts[0]],
         });
@@ -1191,9 +1211,9 @@ const initialize = async () => {
 
     decryptButton.onclick = async () => {
       try {
-        cleartextDisplay.innerText = await ethereum.request({
+        cleartextDisplay.innerText = await window.qtum.request({
           method: 'eth_decrypt',
-          params: [ciphertextDisplay.innerText, ethereum.selectedAddress],
+          params: [ciphertextDisplay.innerText, window.qtum.selectedAddress],
         });
       } catch (error) {
         cleartextDisplay.innerText = `Error: ${error.message}`;
@@ -1242,7 +1262,7 @@ const initialize = async () => {
         },
       ];
     }
-    const result = await ethereum.request({
+    const result = await window.qtum.request({
       method: 'eth_sendTransaction',
       params,
     });
@@ -1258,7 +1278,7 @@ const initialize = async () => {
       // const msgHash = keccak256(msg)
       const msg =
         '0x879a053d4800c6354e76c7985a865d2922c82fb5b3f4577b2fe08b998954f2e0';
-      const ethResult = await ethereum.request({
+      const ethResult = await window.qtum.request({
         method: `${isRSV() ? 'eth' : 'btc'}_sign`,
         params: [accounts[0], msg],
       });
@@ -1277,7 +1297,7 @@ const initialize = async () => {
     try {
       const from = accounts[0];
       const msg = `0x${Buffer.from(exampleMessage, 'utf8').toString('hex')}`;
-      const sign = await ethereum.request({
+      const sign = await window.qtum.request({
         method: isRSV() ? 'personal_sign' : 'btc_personalSign',
         params: [msg, from, 'Example password'],
       });
@@ -1297,8 +1317,8 @@ const initialize = async () => {
     try {
       const from = accounts[0];
       const msg = `0x${Buffer.from(siweMessage, 'utf8').toString('hex')}`;
-      const sign = await ethereum.request({
-        method: isRSV() ? 'presonal_sign' : 'btc_personalSign',
+      const sign = await window.qtum.request({
+        method: isRSV() ? 'personal_sign' : 'btc_personalSign',
         params: [msg, from, 'Example password'],
       });
       siweResult.innerHTML = sign;
@@ -1391,7 +1411,7 @@ const initialize = async () => {
         );
         console.log(`Failed comparing ${recoveredAddr} to ${from}`);
       }
-      const ecRecoverAddr = await ethereum.request({
+      const ecRecoverAddr = await window.qtum.request({
         method: `${isRSV() ? 'personal' : 'btc'}_ecRecover`,
         params: [msg, sign, from],
       });
@@ -1428,7 +1448,7 @@ const initialize = async () => {
     ];
     try {
       const from = accounts[0];
-      const sign = await ethereum.request({
+      const sign = await window.qtum.request({
         method: `${isRSV() ? 'eth' : 'btc'}_signTypedData`,
         params: [msgParams, from],
       });
@@ -1529,7 +1549,7 @@ const initialize = async () => {
     };
     try {
       const from = accounts[0];
-      const sign = await ethereum.request({
+      const sign = await window.qtum.request({
         method: `${isRSV() ? 'eth' : 'btc'}_signTypedData_v3`,
         params: [from, JSON.stringify(msgParams)],
       });
@@ -1673,7 +1693,7 @@ const initialize = async () => {
     };
     try {
       const from = accounts[0];
-      const sign = await ethereum.request({
+      const sign = await window.qtum.request({
         method: `${isRSV() ? 'eth' : 'btc'}_signTypedData_v4`,
         params: [from, JSON.stringify(msgParams)],
       });
@@ -1847,7 +1867,7 @@ const initialize = async () => {
     };
 
     try {
-      sign = await ethereum.request({
+      sign = await window.qtum.request({
         method: `${isRSV() ? 'eth' : 'btc'}_signTypedData_v4`,
         params: [from, JSON.stringify(msgParams)],
       });
@@ -1988,17 +2008,17 @@ const initialize = async () => {
 
   async function getNetworkAndChainId() {
     try {
-      const chainId = await ethereum.request({
+      const chainId = await window.qtum.request({
         method: 'eth_chainId',
       });
       handleNewChain(chainId);
 
-      const networkId = await ethereum.request({
+      const networkId = await window.qtum.request({
         method: 'net_version',
       });
       handleNewNetwork(networkId);
 
-      const block = await ethereum.request({
+      const block = await window.qtum.request({
         method: 'eth_getBlockByNumber',
         params: ['latest', false],
       });
@@ -2012,15 +2032,19 @@ const initialize = async () => {
   updateButtons();
 
   if (isMetaMaskInstalled()) {
-    ethereum.autoRefreshOnNetworkChange = false;
+    if (typeof window.ethereum.autoRefreshOnNetworkChange !== 'undefined') {
+      window.qtum.autoRefreshOnNetworkChange = false;
+    }
     getNetworkAndChainId();
 
-    ethereum.autoRefreshOnNetworkChange = false;
+    if (typeof window.ethereum.autoRefreshOnNetworkChange !== 'undefined') {
+      window.qtum.autoRefreshOnNetworkChange = false;
+    }
     getNetworkAndChainId();
 
-    ethereum.on('chainChanged', (chain) => {
+    window.qtum.on('chainChanged', (chain) => {
       handleNewChain(chain);
-      ethereum
+      window.qtum
         .request({
           method: 'eth_getBlockByNumber',
           params: ['latest', false],
@@ -2029,9 +2053,11 @@ const initialize = async () => {
           handleEIP1559Support(block.baseFeePerGas !== undefined);
         });
     });
-    ethereum.on('chainChanged', handleNewNetwork);
-    ethereum.on('accountsChanged', (newAccounts) => {
-      ethereum
+    window.qtum.on('networkChanged', (...args) => {
+      handleNewNetwork(...args);
+    });
+    window.qtum.on('accountsChanged', (newAccounts) => {
+      window.qtum
         .request({
           method: 'eth_getBlockByNumber',
           params: ['latest', false],
@@ -2043,7 +2069,7 @@ const initialize = async () => {
     });
 
     try {
-      const newAccounts = await ethereum.request({
+      const newAccounts = await window.qtum.request({
         method: 'eth_accounts',
       });
       handleNewAccounts(newAccounts);

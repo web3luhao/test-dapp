@@ -7,6 +7,7 @@ module.exports = {
 
   globals: {
     ethereum: 'readonly',
+    qtum: 'readonly',
   },
 
   extends: ['@metamask/eslint-config', '@metamask/eslint-config-nodejs'],
